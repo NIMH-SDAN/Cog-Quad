@@ -1,0 +1,167 @@
+TITLE: Cog Quad SEM Model with Age
+
+DATA: FILE IS CogQuad_CompiledData.csv;
+
+VARIABLE: NAMES ARE
+SDAN	
+AXCPT_dprime
+AS_PerCorr
+FL_RTDiff
+SST_SSRT
+SCA_Ppan	
+SCA_Pgen	
+SCA_Psep
+SCA_Psoc
+SCA_Psch	
+ARI_P1
+ARI_P2
+ARI_P3
+ARI_P4
+ARI_P5
+ARI_P6	
+C_HI_3
+C_IN_9
+C_IN_10
+C_IN_20
+C_HI_23
+C_IN_29
+C_IN_30
+C_HI_39
+C_IN_41
+C_HI_42
+C_HI_49
+C_IN_50
+C_HI_55
+C_HI_59
+C_IN_71
+C_HI_76
+C_IN_79
+C_HI_80
+Age;
+
+USEVAR=
+AXCPT_dprime
+AS_PerCorr
+FL_RTDiff
+SST_SSRT
+SCA_Ppan	
+SCA_Pgen	
+SCA_Psep
+SCA_Psoc
+SCA_Psch	
+ARI_P1
+ARI_P2
+ARI_P3
+ARI_P4
+ARI_P5
+ARI_P6	
+C_IN_79
+C_IN_41
+C_IN_30
+C_HI_49
+C_HI_42
+C_HI_55
+Age;
+
+IDVARIABLE IS SDAN;
+
+CATEGORICAL ARE
+ARI_P1
+ARI_P2
+ARI_P3
+ARI_P4
+ARI_P5
+ARI_P6
+C_IN_79
+C_IN_41
+C_IN_30
+C_HI_49
+C_HI_42
+C_HI_55;
+
+MISSING = 
+AXCPT_dprime
+AS_PerCorr
+FL_RTDiff
+SST_SSRT
+SCA_Ppan	
+SCA_Pgen	
+SCA_Psep
+SCA_Psoc
+SCA_Psch	
+ARI_P1
+ARI_P2
+ARI_P3
+ARI_P4
+ARI_P5
+ARI_P6	
+C_IN_79
+C_IN_41
+C_IN_30
+C_HI_49
+C_HI_42
+C_HI_55
+Age(999);
+
+DEFINE:
+STANDARDIZE 
+AXCPT_dprime
+AS_PerCorr
+FL_RTDiff
+SST_SSRT;
+
+ANALYSIS:
+BOOTSTRAP = 1000;
+
+MODEL:
+finh BY
+AXCPT_dprime*
+AS_PerCorr*
+FL_RTDiff*
+SST_SSRT*;
+
+fanx BY
+SCA_Pgen*
+SCA_Ppan*
+SCA_Psch*
+SCA_Psep*
+SCA_Psoc*;
+
+firr BY
+ARI_P1*
+ARI_P2*
+ARI_P3*
+ARI_P4*
+ARI_P5*
+ARI_P6*;
+
+fadhd BY 
+C_IN_79*
+C_IN_41*
+C_IN_30*
+C_HI_49*
+C_HI_42*
+C_HI_55*;
+
+
+fanx ON finh;
+fadhd ON finh;
+firr ON finh;
+finh WITH age; 
+
+fanx@1;
+firr@1;
+fadhd@1;
+finh@1;
+
+fanx WITH firr;
+fanx WITH fadhd;
+firr WITH fadhd;
+
+
+OUTPUT: SAMPSTAT CINTERVAL(BCBOOTSTRAP) STANDARDIZED RESIDUAL TECH1 TECH4 MODINDICES(0);
+
+SAVEDATA:
+FILE IS CogQuadSEMWithAge_CorrelatedFactors_6.21 .23.txt;
+SAVE IS fscores;
+FORMAT IS free;

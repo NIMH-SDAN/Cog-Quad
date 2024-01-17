@@ -1,0 +1,218 @@
+TITLE: Cog Quad SEM Model with Age
+
+DATA: FILE IS CogQuad_CompiledData_withRSFC_2.csv;
+
+VARIABLE: NAMES ARE
+SDAN	
+AXCPT_dprime
+AS_PerCorr
+FL_RTDiff
+SST_SSRT
+SCA_Ppan	
+SCA_Pgen	
+SCA_Psep
+SCA_Psoc
+SCA_Psch	
+ARI_P1
+ARI_P2
+ARI_P3
+ARI_P4
+ARI_P5
+ARI_P6	
+C_HI_3
+C_IN_9
+C_IN_10
+C_IN_20
+C_HI_23
+C_IN_29
+C_IN_30
+C_HI_39
+C_IN_41
+C_HI_42
+C_HI_49
+C_IN_50
+C_HI_55
+C_HI_59
+C_IN_71
+C_HI_76
+C_IN_79
+C_HI_80
+Age
+GlobEff_5
+ConEff_5
+SalEff_5
+GlobEff_10
+ConEff_10
+SalEff_10
+GlobEff_15
+ConEff_15
+SalEff_15
+GlobEff_20
+ConEff_20
+Con_aDMN;
+
+USEVAR=
+AXCPT_dprime
+AS_PerCorr
+FL_RTDiff
+SST_SSRT
+SCA_Ppan	
+SCA_Pgen	
+SCA_Psep
+SCA_Psoc
+SCA_Psch	
+ARI_P1
+ARI_P2
+ARI_P3
+ARI_P4
+ARI_P5
+ARI_P6	
+C_IN_79
+C_IN_41
+C_IN_30
+C_HI_49
+C_HI_42
+C_HI_55
+Age
+GlobEff_5;
+
+IDVARIABLE IS SDAN;
+
+CATEGORICAL ARE
+ARI_P1
+ARI_P2
+ARI_P3
+ARI_P4
+ARI_P5
+ARI_P6
+C_IN_79
+C_IN_41
+C_IN_30
+C_HI_49
+C_HI_42
+C_HI_55;
+
+MISSING = 
+AXCPT_dprime
+AS_PerCorr
+FL_RTDiff
+SST_SSRT
+SCA_Ppan	
+SCA_Pgen	
+SCA_Psep
+SCA_Psoc
+SCA_Psch	
+ARI_P1
+ARI_P2
+ARI_P3
+ARI_P4
+ARI_P5
+ARI_P6	
+C_IN_79
+C_IN_41
+C_IN_30
+C_HI_49
+C_HI_42
+C_HI_55
+Age
+GlobEff_5
+ConEff_5
+SalEff_5
+GlobEff_10
+ConEff_10
+SalEff_10
+GlobEff_15
+ConEff_15
+SalEff_15
+GlobEff_20
+ConEff_20
+Con_aDMN(999);
+
+DEFINE:
+STANDARDIZE 
+AXCPT_dprime
+AS_PerCorr
+FL_RTDiff
+SST_SSRT
+GlobEff_5;
+
+ANALYSIS:
+BOOTSTRAP = 1000;
+
+MODEL:
+finh BY
+AXCPT_dprime*
+AS_PerCorr*
+FL_RTDiff*
+SST_SSRT*;
+
+fanx BY
+SCA_Pgen*
+SCA_Ppan*
+SCA_Psch*
+SCA_Psep*
+SCA_Psoc*;
+
+firr BY
+ARI_P1*
+ARI_P2*
+ARI_P3*
+ARI_P4*
+ARI_P5*
+ARI_P6*;
+
+fadhd BY
+C_IN_79*
+C_IN_41*
+C_IN_30*
+C_HI_49*
+C_HI_42*
+C_HI_55*;
+
+fgen BY 
+SCA_Ppan*	
+SCA_Pgen*	
+SCA_Psep*
+SCA_Psoc*
+SCA_Psch*	
+ARI_P1*
+ARI_P2*
+ARI_P3*
+ARI_P4*
+ARI_P5*
+ARI_P6*
+C_IN_79*
+C_IN_41*
+C_IN_30*
+C_HI_49*
+C_HI_42*
+C_HI_55*;
+
+fgen ON finh age GlobEff_5;
+fanx ON finh;
+firr ON finh;
+fadhd ON finh;
+GlobEff_5 ON finh;
+finh WITH age; 
+
+finh@1;
+fgen@1;
+firr@1;
+fanx@1;
+fadhd@1;
+fgen WITH firr@0;
+fgen WITH fanx@0;
+fgen WITH fadhd@0;
+firr WITH fanx@0;
+firr WITH fadhd@0;
+fanx WITH fadhd@0;
+
+MODEL INDIRECT:
+Fgen IND GlobEff_5 finh;
+
+OUTPUT: SAMPSTAT CINTERVAL(BCBOOTSTRAP) STANDARDIZED RESIDUAL TECH1 TECH4 MODINDICES(0);
+
+SAVEDATA:
+FILE IS CogQuadSEMWithAge_RSFCstand_GlobEff5_BCBOOTSTRAP_5.17.22.txt;
+SAVE IS fscores;
+FORMAT IS free;
